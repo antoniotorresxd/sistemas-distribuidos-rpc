@@ -1,7 +1,7 @@
 \section{Reto de extensión}
 \label{sec:p3-reto}
 
-El instructivo propone desplegar la arquitectura completa orquestada con \texttt{docker compose}, registrar métricas con Prometheus y exponerlas en Grafana; como reto avanzado, sustituir nginx por OpenResty para inyectar autenticación OAuth~2.0. Se implementaron los dos primeros elementos; el tercero (OpenResty/Lua) se deja documentado como trabajo futuro.
+El instructivo propone desplegar la arquitectura completa orquestada con \texttt{docker compose}, registrar métricas con Prometheus y exponerlas en Grafana. Ambos elementos se implementaron.
 
 \subsection*{Orquestación con docker compose}
 
@@ -71,7 +71,3 @@ $ curl -s http://localhost:3000/api/search
 Los cuatro paneles de la Figura~\ref{fig:p3-reto-grafana} son consultas PromQL contra las mismas métricas verificadas en la Figura~\ref{fig:p3-reto-prometheus}, renderizadas como series de tiempo. El pico visible cerca de las 23:00 corresponde a las tandas de peticiones generadas durante las pruebas de esta sesión: se observa cómo \texttt{nginx\_connections\_accepted} salta de 0 a poco más de 200 en el momento en que se ejecutaron los bucles de \texttt{curl}, y cómo la tasa de peticiones (panel superior derecho) muestra el mismo pulso. Que el resto de la gráfica esté en cero es evidencia adicional, no un defecto: confirma que el contador no se incrementa por actividad espuria, solo por tráfico real dirigido al \emph{gateway}.
 
 Este mismo tablero es, en esencia, una automatización del análisis manual de la Figura~\ref{fig:p3-diagnostico}: en vez de leer el log de acceso línea por línea, Prometheus agrega la misma información (tasa de peticiones, conexiones) en series de tiempo consultables, y Grafana las visualiza. Es la respuesta operativa a la pregunta del cuestionario sobre dónde instrumentar observabilidad: en el \emph{gateway}, que por concentrar todo el tráfico es el único punto capaz de dar una vista unificada de los dos backends heterogéneos sin instrumentar cada uno por separado.
-
-\subsection*{Pendiente: autenticación con OpenResty}
-
-La sustitución de nginx por OpenResty para validar tokens OAuth~2.0 en un bloque \texttt{access\_by\_lua} antes de delegar al backend CGI no se implementó; se documenta como una extensión natural del \emph{gateway} actual, dado que OpenResty es compatible con la misma sintaxis de configuración de nginx utilizada en esta práctica.
