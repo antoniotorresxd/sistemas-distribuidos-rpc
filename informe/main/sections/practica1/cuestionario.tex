@@ -1,0 +1,25 @@
+\section{Cuestionario de cierre}
+
+\begin{enumerate}[label=\arabic*.]
+
+\item \textbf{¿Qué semántica de invocación (at-most-once, at-least-once, exactly-once) ofrece por defecto su implementación? Justifique.}
+
+Sin la clave de idempotencia del reto de extensión, \texttt{saludo.cgi} ofrece \emph{at-most-once} únicamente a nivel de una sola conexión TCP exitosa: ni nginx ni \texttt{fcgiwrap} reintentan automáticamente una petición, de modo que cada solicitud aceptada ejecuta el script exactamente una vez. Sin embargo, el sistema \emph{no} garantiza \emph{exactly-once} de extremo a extremo: si la respuesta se pierde en la red (por ejemplo, el cliente se desconecta antes de recibirla) y el propio cliente decide reintentar manualmente, el script volverá a ejecutarse, duplicando el efecto observable. Desde el punto de vista del sistema completo (cliente + red + servidor) el comportamiento se acerca entonces a \emph{at-least-once} en presencia de reintentos. Esto solo es seguro en la práctica porque \texttt{saludo.cgi} es una operación idempotente por naturaleza —solo lee y da formato, no muta estado persistente—, por lo que ejecutarla dos veces produce el mismo efecto observable que ejecutarla una sola vez.
+
+\item \textbf{¿Por qué nginx requiere fcgiwrap para ejecutar scripts CGI mientras que Apache no?}
+
+Apache HTTP Server utiliza un modelo de ejecución basado en procesos o hilos (\emph{prefork}/\emph{worker} MPM) en el que cada \emph{worker} puede bloquearse temporalmente haciendo \texttt{fork}/\texttt{exec} de un script CGI sin degradar al resto del servidor; por ello incluye de forma nativa el módulo \texttt{mod\_cgi}. nginx, en cambio, está diseñado como un servidor asíncrono dirigido por eventos con un número reducido de procesos \emph{worker} que nunca deben bloquearse esperando a un proceso externo; por diseño, nginx solo sabe hablar los protocolos FastCGI, uWSGI y SCGI, y delega la ejecución de procesos externos a un demonio dedicado. \texttt{fcgiwrap} cumple ese rol: traduce el protocolo FastCGI que habla nginx a la convención clásica de variables de entorno y \texttt{stdin}/\texttt{stdout} que un script CGI espera, lanzando el script como un proceso hijo por cada petición FastCGI recibida.
+
+\item \textbf{Identifique al menos dos riesgos de seguridad del script bash y proponga mitigaciones.}
+
+\begin{itemize}
+    \item \emph{Inyección de comandos por parámetros no saneados.} El parámetro \texttt{nombre} se extrae con \texttt{sed} y se decodifica con \texttt{printf '\%b'}, y aunque en la versión actual no se interpola en un contexto de \texttt{eval} o subshell, cualquier extensión futura que reutilice ese valor dentro de una expansión sin comillas o en \texttt{eval} introduciría un riesgo de inyección de comandos. \emph{Mitigación:} mantener siempre las variables entre comillas dobles, evitar \texttt{eval}, y aplicar una lista blanca de caracteres permitidos (p. ej. \texttt{[[ \$nombre =~ \^{}[A-Za-z0-9 ]+\$ ]]}) antes de usar el valor.
+    \item \emph{Ausencia de autenticación y límite de tasa.} El endpoint \texttt{/rpc/} es público y sin control de acceso; cualquier cliente puede invocar el script repetidamente y forzar a \texttt{fcgiwrap} a lanzar un proceso bash por cada petición, lo que puede degenerar en agotamiento de recursos (denegación de servicio). \emph{Mitigación:} agregar \texttt{limit\_req} en nginx para limitar peticiones por IP, y exigir autenticación (API key o mTLS) para invocaciones fuera de un entorno de laboratorio.
+    \item \emph{Directorio de caché compartido y predecible (\texttt{/var/tmp/rpc-cache} en el reto de extensión).} Al ser un directorio mundialmente escribible, es susceptible a ataques de \emph{symlink} o a que otro usuario del sistema sobrescriba o lea respuestas cacheadas de otros clientes. \emph{Mitigación:} usar un directorio con permisos restringidos y propiedad exclusiva del usuario del servicio (p. ej. \texttt{www-data}), y derivar el nombre del archivo de caché con un hash que incluya un secreto del servidor además de la clave de idempotencia.
+\end{itemize}
+
+\item \textbf{Describa qué ocurre si fcgiwrap se detiene mientras el cliente realiza la petición. ¿Cómo lo notifica nginx?}
+
+Si \texttt{fcgiwrap} se detiene o no está escuchando en el socket Unix configurado, nginx no logra establecer la conexión FastCGI con el \emph{upstream}. Para una petición que llega en ese momento, nginx responde al cliente con \texttt{502 Bad Gateway}, registrando en su log de errores un mensaje del tipo \texttt{connect() to unix:/run/fcgiwrap.socket failed (111: Connection refused)}. Si, en cambio, \texttt{fcgiwrap} está corriendo pero deja de responder a media petición (por ejemplo, el proceso hijo se cuelga), nginx espera hasta agotar \texttt{fastcgi\_read\_timeout} y entonces responde con \texttt{504 Gateway Timeout}. En ambos casos el cliente nunca queda esperando indefinidamente: nginx traduce la falla del \emph{runtime} de RPC en un código de estado HTTP explícito.
+
+\end{enumerate}

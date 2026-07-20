@@ -1,0 +1,63 @@
+\section{Reto de extensión}
+\label{sec:p3-reto}
+
+El instructivo propone desplegar la arquitectura completa orquestada con \texttt{docker compose}, registrar métricas con Prometheus y exponerlas en Grafana; como reto avanzado, sustituir nginx por OpenResty para inyectar autenticación OAuth~2.0. Se implementaron los dos primeros elementos; el tercero (OpenResty/Lua) se deja documentado como trabajo futuro.
+
+\subsection*{Orquestación con docker compose}
+
+Se sustituyeron los comandos manuales \texttt{docker run} por un archivo \texttt{docker-compose.yml} declarativo con cuatro servicios: \texttt{gateway} (la imagen de la práctica, sin cambios en su lógica), \texttt{nginx-exporter} (traduce las métricas de texto plano de nginx a formato Prometheus), \texttt{prometheus} y \texttt{grafana}, todos en la misma red \texttt{pcta3-net}:
+
+\begin{lstlisting}[language=bash]
+$ docker compose up -d --build
+ Network pcta3_pcta3-net Created
+ Container pcta3-gateway Started
+ Container pcta3-nginx-exporter Started
+ Container pcta3-prometheus Started
+ Container pcta3-grafana Started
+\end{lstlisting}
+
+Para que nginx exponga métricas se activó el módulo \texttt{stub\_status} en una ruta interna del propio \emph{gateway}, restringida a la red de contenedores:
+
+\begin{lstlisting}
+location /nginx_status {
+    stub_status on;
+    access_log off;
+    allow 127.0.0.1;
+    allow 172.16.0.0/12;
+    deny all;
+}
+\end{lstlisting}
+
+\subsection*{Métricas con Prometheus}
+
+El exportador de nginx (\texttt{nginx-prometheus-exporter}) consulta \texttt{/nginx\_status} periódicamente y traduce su salida de texto a series de tiempo; Prometheus lo raspa cada 5 segundos según \texttt{monitoring/prometheus.yml}. Se verificó la salud del \emph{target} y se generó tráfico real (30 peticiones a \texttt{/api/v1/cotizar} y a \texttt{/api/v1/saldo}) para confirmar que las métricas responden a actividad real del \emph{gateway}:
+
+\begin{lstlisting}[language=bash]
+$ curl -s http://localhost:9091/api/v1/targets | jq '.data.activeTargets[0].health'
+"up"
+
+$ curl -s http://localhost:9091/api/v1/query?query=nginx_http_requests_total | jq .
+{"metric":{"__name__":"nginx_http_requests_total","job":"nginx"},"value":[..., "67"]}
+\end{lstlisting}
+
+\evidencia{Terminal mostrando docker compose up -d y las consultas anteriores a la API de Prometheus}{fig:p3-reto-prometheus}
+
+\subsection*{Dashboard en Grafana}
+
+Se aprovisionó automáticamente (sin configuración manual, vía los archivos en \texttt{monitoring/}) una fuente de datos Prometheus y un \emph{dashboard} con cuatro paneles: conexiones activas, tasa de peticiones, conexiones aceptadas totales, y el desglose leyendo/escribiendo/esperando de nginx.
+
+\begin{lstlisting}[language=bash]
+$ curl -s http://localhost:3000/api/health
+{"database":"ok","version":"13.1.0"}
+
+$ curl -s http://localhost:3000/api/search
+[{"title":"RPC Gateway - nginx (Práctica 3)","url":"/d/.../rpc-gateway-nginx-practica-3"}]
+\end{lstlisting}
+
+\evidencia{Captura de pantalla del navegador en http://localhost:3000/d/.../rpc-gateway-nginx-practica-3 mostrando los cuatro paneles con datos}{fig:p3-reto-grafana}
+
+Este mismo tablero es, en esencia, una automatización del análisis manual de la Figura~\ref{fig:p3-diagnostico}: en vez de leer el log de acceso línea por línea, Prometheus agrega la misma información (tasa de peticiones, conexiones) en series de tiempo consultables, y Grafana las visualiza. Es la respuesta operativa a la pregunta del cuestionario sobre dónde instrumentar observabilidad: en el \emph{gateway}, que por concentrar todo el tráfico es el único punto capaz de dar una vista unificada de los dos backends heterogéneos sin instrumentar cada uno por separado.
+
+\subsection*{Pendiente: autenticación con OpenResty}
+
+La sustitución de nginx por OpenResty para validar tokens OAuth~2.0 en un bloque \texttt{access\_by\_lua} antes de delegar al backend CGI no se implementó; se documenta como una extensión natural del \emph{gateway} actual, dado que OpenResty es compatible con la misma sintaxis de configuración de nginx utilizada en esta práctica.

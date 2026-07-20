@@ -1,0 +1,17 @@
+00:59:16.593347 eth0  In  IP 172.19.0.3.49966 > 172.19.0.2.8080: Flags [S], seq 3621883537, win 64240, options [mss 1460,sackOK,TS val 3810379414 ecr 0,nop,wscale 10], length 0
+00:59:16.593433 eth0  Out IP 172.19.0.2.8080 > 172.19.0.3.49966: Flags [S.], seq 3523405291, ack 3621883538, win 65160, options [mss 1460,sackOK,TS val 1011475526 ecr 3810379414,nop,wscale 10], length 0
+00:59:16.593509 eth0  In  IP 172.19.0.3.49966 > 172.19.0.2.8080: Flags [.], ack 1, win 63, options [nop,nop,TS val 3810379414 ecr 1011475526], length 0
+00:59:16.619257 eth0  In  IP 172.19.0.3.49966 > 172.19.0.2.8080: Flags [P.], seq 1:328, ack 1, win 63, options [nop,nop,TS val 3810379440 ecr 1011475526], length 327: HTTP: GET /api/v1/cotizar?divisa=USD&monto=100.0 HTTP/1.1
+00:59:16.619274 eth0  Out IP 172.19.0.2.8080 > 172.19.0.3.49966: Flags [.], ack 328, win 64, options [nop,nop,TS val 1011475552 ecr 3810379440], length 0
+00:59:16.636958 eth0  Out IP 172.19.0.2.8080 > 172.19.0.3.49966: Flags [P.], seq 1:299, ack 328, win 64, options [nop,nop,TS val 1011475570 ecr 3810379440], length 298: HTTP: HTTP/1.1 200 OK
+00:59:16.637048 eth0  In  IP 172.19.0.3.49966 > 172.19.0.2.8080: Flags [.], ack 299, win 63, options [nop,nop,TS val 3810379458 ecr 1011475570], length 0
+00:59:16.664548 eth0  In  IP 172.19.0.3.49966 > 172.19.0.2.8080: Flags [P.], seq 328:655, ack 299, win 63, options [nop,nop,TS val 3810379485 ecr 1011475570], length 327: HTTP: GET /api/v1/cotizar?divisa=EUR&monto=250.0 HTTP/1.1
+00:59:16.683546 eth0  Out IP 172.19.0.2.8080 > 172.19.0.3.49966: Flags [P.], seq 299:597, ack 655, win 64, options [nop,nop,TS val 1011475616 ecr 3810379485], length 298: HTTP: HTTP/1.1 200 OK
+00:59:16.688137 eth0  In  IP 172.19.0.3.49966 > 172.19.0.2.8080: Flags [P.], seq 655:981, ack 597, win 63, options [nop,nop,TS val 3810379509 ecr 1011475616], length 326: HTTP: GET /api/v1/cotizar?divisa=MXN&monto=10.0 HTTP/1.1
+00:59:16.698634 eth0  Out IP 172.19.0.2.8080 > 172.19.0.3.49966: Flags [P.], seq 597:835, ack 981, win 64, options [nop,nop,TS val 1011475631 ecr 3810379509], length 238: HTTP: HTTP/1.1 422 Unprocessable Entity
+00:59:16.701150 eth0  In  IP 172.19.0.3.49966 > 172.19.0.2.8080: Flags [P.], seq 981:1202, ack 835, win 63, options [nop,nop,TS val 3810379522 ecr 1011475631], length 221: HTTP: GET /api/v1/saldo HTTP/1.1
+00:59:16.711756 eth0  Out IP 172.19.0.2.8080 > 172.19.0.3.49966: Flags [P.], seq 835:1065, ack 1202, win 64, options [nop,nop,TS val 1011475644 ecr 3810379522], length 230: HTTP: HTTP/1.1 200 OK
+00:59:16.751861 eth0  In  IP 172.19.0.3.49966 > 172.19.0.2.8080: Flags [.], ack 1065, win 63, options [nop,nop,TS val 3810379573 ecr 1011475644], length 0
+00:59:17.036599 eth0  In  IP 172.19.0.3.49966 > 172.19.0.2.8080: Flags [F.], seq 1202, ack 1065, win 63, options [nop,nop,TS val 3810379857 ecr 1011475644], length 0
+00:59:17.036653 eth0  Out IP 172.19.0.2.8080 > 172.19.0.3.49966: Flags [F.], seq 1065, ack 1203, win 64, options [nop,nop,TS val 1011475969 ecr 3810379857], length 0
+00:59:17.036685 eth0  In  IP 172.19.0.3.49966 > 172.19.0.2.8080: Flags [.], ack 1066, win 63, options [nop,nop,TS val 3810379857 ecr 1011475969], length 0

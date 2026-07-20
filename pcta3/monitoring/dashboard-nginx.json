@@ -1,0 +1,41 @@
+{
+  "title": "RPC Gateway - nginx (Práctica 3)",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Conexiones activas",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "nginx_connections_active", "refId": "A" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Peticiones aceptadas / manejadas (tasa)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "rate(nginx_http_requests_total[1m])", "refId": "A" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Conexiones aceptadas totales",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "nginx_connections_accepted", "refId": "A" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Conexiones leyendo / escribiendo / esperando",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        { "expr": "nginx_connections_reading", "refId": "A" },
+        { "expr": "nginx_connections_writing", "refId": "B" },
+        { "expr": "nginx_connections_waiting", "refId": "C" }
+      ]
+    }
+  ]
+}

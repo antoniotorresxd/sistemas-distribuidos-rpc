@@ -1,0 +1,15 @@
+\begin{description}
+\glosentry{RPC (Remote Procedure Call)}{Protocolo de comunicación entre procesos que permite a un programa invocar un procedimiento que reside en otro espacio de direcciones, sin que el programador codifique explícitamente los detalles de la red~\cite{birrell1984rpc}.}
+\glosentry{Stub}{Artefacto de software, generado a partir de una interfaz, que representa localmente al procedimiento remoto: empaqueta (\emph{marshalls}) los parámetros de la llamada y desempaqueta la respuesta.}
+\glosentry{Marshalling / unmarshalling}{Conversión de los argumentos y resultados de una llamada a un formato común de transporte (y su conversión inversa) para que puedan viajar por la red.}
+\glosentry{IDL (Interface Definition Language)}{Lenguaje formal para describir las firmas de los procedimientos remotos, a partir del cual se generan automáticamente los stubs (p. ej. una interfaz Java en RMI, o un archivo \texttt{.proto} en gRPC).}
+\glosentry{CGI (Common Gateway Interface)}{Especificación que permite a un servidor web ejecutar un programa externo para generar dinámicamente la respuesta a una petición HTTP, usando variables de entorno como entrada y la salida estándar como cuerpo de la respuesta.}
+\glosentry{FastCGI}{Protocolo binario que sustituye al CGI clásico para evitar el costo de iniciar un proceso nuevo por cada petición; es el único protocolo de ejecución de scripts externos que nginx entiende de forma nativa.}
+\glosentry{fcgiwrap}{Demonio adaptador que traduce el protocolo FastCGI hablado por nginx a la convención de variables de entorno y \texttt{stdin}/\texttt{stdout} que un script CGI clásico espera.}
+\glosentry{RMI (Remote Method Invocation)}{Implementación de RPC nativa del ecosistema Java, en la que la interfaz remota (que extiende \texttt{java.rmi.Remote}) actúa como IDL y el propio lenguaje Java genera el stub dinámico.}
+\glosentry{JRMP (Java Remote Method Protocol)}{Protocolo de transporte por defecto de Java RMI, que viaja sobre TCP.}
+\glosentry{rmiregistry}{Servicio de nombres de Java RMI en el que el servidor publica sus objetos remotos y el cliente los localiza.}
+\glosentry{Idempotencia}{Propiedad de una operación que produce el mismo efecto observable sin importar cuántas veces se ejecute; es la condición que permite tolerar reintentos de forma segura en un sistema distribuido.}
+\glosentry{Semántica de invocación}{Garantía que ofrece un sistema RPC sobre cuántas veces se ejecuta efectivamente el procedimiento remoto ante fallos de red: \emph{at-least-once}, \emph{at-most-once} o \emph{exactly-once}.}
+\glosentry{Gateway / reverse proxy}{Componente (en este trabajo, nginx) que recibe las peticiones de un cliente y las reenvía a uno o más servicios backend, ocultando su topología interna.}
+\end{description}

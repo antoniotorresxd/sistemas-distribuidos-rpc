@@ -1,0 +1,21 @@
+\section{Cuestionario de cierre}
+
+\begin{enumerate}[label=\arabic*.]
+
+\item \textbf{Explique por qué los reintentos con backoff exponencial deben combinarse con claves de idempotencia para evitar duplicados.}
+
+Un reintento asume que la petición original pudo no haber llegado al servidor, pero no puede distinguir ese caso de aquel en que la petición sí se procesó y solo se perdió la respuesta en el camino de vuelta. Sin una clave de idempotencia, un reintento sobre una operación no idempotente (por ejemplo, un cargo o un incremento de saldo) duplicaría su efecto. La clave de idempotencia traslada la responsabilidad de detectar duplicados al servidor: este cachea la primera respuesta asociada a la clave y, ante una repetición con la misma clave, la devuelve sin volver a ejecutar la operación, independientemente de cuántas veces el cliente reintente con backoff exponencial.
+
+\item \textbf{Discuta el costo de inicialización del proceso bash en CGI frente a un proceso de larga duración (FastCGI persistente o servicio JVM). ¿Cuándo es aceptable cada uno?}
+
+Cada invocación a un script CGI clásico implica que \texttt{fcgiwrap} haga \texttt{fork}/\texttt{exec} de un proceso bash nuevo, cargar el interprete y ejecutar el script desde cero; ese costo de arranque (del orden de milisegundos, pero no despreciable bajo carga) se repite en cada petición. Un proceso de larga duración —un servicio FastCGI persistente escrito en un lenguaje compilado, o una JVM que mantiene su propio \emph{runtime}, JIT y pools de conexiones ya inicializados— amortiza ese costo entre todas las peticiones que atiende. El modelo CGI/bash es aceptable en escenarios de baja frecuencia de invocación, prototipado rápido o tareas administrativas poco críticas en latencia; el modelo de proceso persistente es preferible cuando el volumen de peticiones o los requisitos de latencia hacen inaceptable el costo de arranque repetido, como ocurre en el backend JVM de \texttt{/api/v1/saldo} de esta misma práctica.
+
+\item \textbf{Si quisiera migrar este servicio a gRPC sobre HTTP/2, ¿qué cambios mínimos haría en cada uno de los componentes?}
+
+En el cliente, se sustituiría \texttt{HttpClient} por un \emph{stub} generado a partir de un archivo \texttt{.proto} que describa el servicio de cotización, eliminando la construcción manual de URLs y encabezados. En nginx, se reemplazaría la configuración de \texttt{proxy\_pass}/\texttt{fastcgi\_pass} por un bloque que hable HTTP/2 de extremo a extremo hacia el backend gRPC (nginx soporta esto de forma nativa a partir de la versión 1.13.10). El script \texttt{cotizar.cgi} tendría que reescribirse como un servicio persistente en un lenguaje con soporte de gRPC (Go, Java, Python), ya que bash no cuenta con una implementación viable del protocolo; esa reescritura conserva la lógica de negocio (cálculo de la cotización) pero traslada el marshalling de JSON manual a la serialización binaria de Protocol Buffers generada automáticamente por el compilador \texttt{protoc}.
+
+\item \textbf{Identifique los puntos donde introduciría observabilidad (métricas, logs y trazas) para diagnosticar latencias.}
+
+Como mínimo: (1) en nginx, habilitar un formato de log que incluya \texttt{\$upstream\_response\_time} y \texttt{\$request\_time} para separar el tiempo consumido por el backend del tiempo total de la petición; (2) en \texttt{cotizar.cgi}, registrar una marca de tiempo al inicio y al final del script hacia \texttt{journalctl} o un archivo de log dedicado, para aislar el costo de arranque del proceso bash; (3) en el cliente Java, instrumentar cada intento (incluyendo los reintentos) con una traza que registre el identificador de idempotencia, el número de intento y la latencia observada, de forma que un identificador de traza distribuida (p. ej. mediante encabezados compatibles con OpenTelemetry) permita correlacionar una misma operación lógica a través del cliente, nginx y el backend.
+
+\end{enumerate}

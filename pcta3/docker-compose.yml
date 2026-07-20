@@ -1,0 +1,52 @@
+services:
+  gateway:
+    build: .
+    container_name: pcta3-gateway
+    ports:
+      - "8082:8080"
+    networks:
+      - pcta3-net
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: pcta3-nginx-exporter
+    command:
+      - "--nginx.scrape-uri=http://gateway:8080/nginx_status"
+    depends_on:
+      - gateway
+    networks:
+      - pcta3-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pcta3-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9091:9090"
+    depends_on:
+      - nginx-exporter
+    networks:
+      - pcta3-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pcta3-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=esimecu2026
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - ./monitoring/grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml:ro
+      - ./monitoring/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
+      - ./monitoring/dashboard-nginx.json:/etc/grafana/provisioning/dashboards/dashboard-nginx.json:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - pcta3-net
+
+networks:
+  pcta3-net:
+    driver: bridge

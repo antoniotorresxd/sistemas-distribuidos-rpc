@@ -1,0 +1,23 @@
+\section{Cuestionario de cierre}
+
+\begin{enumerate}[label=\arabic*.]
+
+\item \textbf{¿Por qué todos los métodos remotos deben declarar \texttt{throws RemoteException}?}
+
+Porque una invocación remota puede fallar por razones que no existen en una llamada local —caída de la red, del \texttt{rmiregistry} o de la JVM remota, tiempo de espera agotado, error de serialización— y el modelo de RMI exige que el programador reconozca explícitamente esa posibilidad de fallo en la firma del método. \texttt{RemoteException} es la forma en que Java preserva, dentro de la transparencia sintáctica que ofrece RMI, la advertencia de que la llamada atraviesa una red falible.
+
+\item \textbf{¿Qué función cumple \texttt{serialVersionUID} en la serialización Java y qué pasa si se omite?}
+
+\texttt{serialVersionUID} identifica la versión de una clase serializable para que, al deserializar un objeto, la JVM pueda verificar que la clase del receptor es compatible con la del emisor. Si se omite, el compilador genera uno automáticamente a partir de los detalles estructurales de la clase (nombre de campos, métodos, modificadores); cualquier cambio aparentemente inocuo en la clase —agregar un método, por ejemplo— puede alterar ese valor calculado y provocar una \texttt{InvalidClassException} en tiempo de ejecución al intentar deserializar un objeto generado con una versión anterior de la clase.
+
+\item \textbf{¿En qué casos sería necesario fijar la propiedad \texttt{java.rmi.server.hostname}?}
+
+Cuando el servidor tiene más de una interfaz de red o está detrás de NAT/Docker, la JVM puede anunciar en el stub una dirección IP interna o no alcanzable desde el cliente (por ejemplo, la dirección del \emph{bridge} interno de un contenedor). Fijar explícitamente \texttt{java.rmi.server.hostname} obliga al \emph{runtime} de RMI a publicar en el stub la dirección IP o el nombre de host por el cual el cliente sí puede alcanzar al servidor.
+
+\item \textbf{Indique al menos una diferencia y una similitud entre Java RMI y gRPC.}
+
+\emph{Similitud:} ambos son implementaciones del modelo RPC que generan automáticamente el stub del cliente a partir de un contrato de interfaz (una interfaz Java que extiende \texttt{Remote} en RMI; un archivo \texttt{.proto} en gRPC), ocultando al programador el marshalling de los parámetros.
+
+\emph{Diferencia:} RMI está acoplado al lenguaje Java —tanto el cliente como el servidor deben ser JVMs— y utiliza JRMP, un protocolo de serialización propietario de Java; gRPC es agnóstico al lenguaje, define su IDL con Protocol Buffers y transporta los mensajes sobre HTTP/2, lo que le permite interoperar entre servicios escritos en distintos lenguajes y aprovechar streaming bidireccional nativo del protocolo HTTP/2.
+
+\end{enumerate}

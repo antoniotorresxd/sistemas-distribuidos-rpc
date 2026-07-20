@@ -1,0 +1,220 @@
+\documentclass[12pt,letterpaper,oneside]{report}
+
+% -----------------------------------------------------------------------
+% IDIOMA Y CODIFICACIÓN
+% -----------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla,es-nodecimaldot]{babel}
+\usepackage{csquotes}
+
+% -----------------------------------------------------------------------
+% TIPOGRAFÍA (Times-like) Y MICROTIPOGRAFÍA
+% -----------------------------------------------------------------------
+\usepackage{mathptmx}
+\usepackage{microtype}
+
+% -----------------------------------------------------------------------
+% ESPACIADO (IPN: 1.5) + PÁRRAFOS
+% -----------------------------------------------------------------------
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+
+% -----------------------------------------------------------------------
+% MÁRGENES (encuadernación) Y HEADER/FOOTER
+% -----------------------------------------------------------------------
+\usepackage{geometry}
+\geometry{
+  letterpaper,
+  left=3.5cm,
+  right=2.5cm,
+  top=2.5cm,
+  bottom=2.5cm,
+  headheight=14.5pt,
+  headsep=0.7cm,
+  footskip=1.2cm
+}
+
+% -----------------------------------------------------------------------
+% DISEÑO, IMÁGENES, TABLAS Y CÓDIGO
+% -----------------------------------------------------------------------
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{calc, shapes, arrows, positioning, arrows.meta, babel}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xltabular}
+\usepackage{colortbl}
+\usepackage{listings}
+\usepackage{longtable}
+
+\setlist[itemize]{noitemsep, topsep=3pt}
+\setlist[enumerate]{noitemsep, topsep=3pt}
+
+% Colores institucionales
+\definecolor{guinda}{RGB}{108, 19, 43}
+\definecolor{esimegreen}{RGB}{0, 103, 56}
+\definecolor{rowgray}{HTML}{F8F9FA}
+\definecolor{codebg}{HTML}{F5F5F5}
+
+\captionsetup[figure]{labelfont={bf}, name={Figura}, labelsep=period}
+\captionsetup[table]{labelfont={bf}, name={Tabla}, labelsep=period}
+
+% Bloques de código (bash / nginx / curl / java)
+\lstdefinestyle{consola}{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{gray!40},
+  columns=fullflexible,
+  keepspaces=true,
+  extendedchars=true,
+  literate=%
+    {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1%
+    {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1%
+    {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+}
+\lstset{style=consola}
+
+% -----------------------------------------------------------------------
+% ESPACIOS RESERVADOS PARA EVIDENCIA (CAPTURAS DE PANTALLA)
+% -----------------------------------------------------------------------
+% Uso: \evidencia{descripción de lo que debe capturarse}{etiqueta-fig}
+\newcommand{\evidencia}[2]{%
+\begin{figure}[H]
+\centering
+\fbox{\parbox[c][4.5cm][c]{0.85\linewidth}{\centering
+\textbf{[ESPACIO RESERVADO PARA CAPTURA DE PANTALLA]}\\[0.3cm]
+\footnotesize #1}}
+\caption{#1}
+\label{#2}
+\end{figure}%
+}
+
+% -----------------------------------------------------------------------
+% CONTROL DE VIUDAS/HUÉRFANAS
+% -----------------------------------------------------------------------
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+% -----------------------------------------------------------------------
+% HIPERVÍNCULOS (PDF)
+% -----------------------------------------------------------------------
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue,
+  pdftitle={Reporte Técnico Integrador -- Sistemas Distribuidos: RPC},
+  pdfauthor={Antonio Torres}
+}
+
+% -----------------------------------------------------------------------
+% BIBLIOGRAFÍA [IEEE] CON BIBLATEX
+% -----------------------------------------------------------------------
+\usepackage[backend=biber,style=ieee]{biblatex}
+\addbibresource{./lib/referencias.bib}
+
+% -----------------------------------------------------------------------
+% ENCABEZADOS Y PIES
+% -----------------------------------------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% -----------------------------------------------------------------------
+% FORMATO DE TÍTULOS DE CAPÍTULO
+% -----------------------------------------------------------------------
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{18pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-10pt}{30pt}
+
+% -----------------------------------------------------------------------
+% GLOSARIO SIMPLE (lista de descripción)
+% -----------------------------------------------------------------------
+\newcommand{\glosentry}[2]{\item[\textbf{#1}] #2}
+
+% -----------------------------------------------------------------------
+% DATOS DEL DOCUMENTO
+% -----------------------------------------------------------------------
+\title{Reporte Técnico Integrador --- Arquitectura de llamada a procedimientos remotos (RPC)}
+\author{Antonio Torres}
+\date{\today}
+
+\begin{document}
+
+% ---------------------------------------------------------------------
+% PRELIMINARES
+% ---------------------------------------------------------------------
+\pagenumbering{roman}
+
+\input{sections/portada}
+\clearpage
+
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+
+\chapter*{Glosario}
+\addcontentsline{toc}{chapter}{Glosario}
+\input{sections/glosario}
+\clearpage
+
+% ---------------------------------------------------------------------
+% CONTENIDO PRINCIPAL
+% ---------------------------------------------------------------------
+\pagenumbering{arabic}
+
+\chapter{Introducción y marco teórico general}
+\input{sections/marco_teorico}
+
+\chapter{Práctica de laboratorio 1 --- RPC con CGI y Shell script sobre nginx}
+\label{ch:practica1}
+\input{sections/practica1/desarrollo}
+\input{sections/practica1/cuestionario}
+\input{sections/practica1/reto}
+
+\chapter{Práctica de laboratorio 2 --- Java RMI}
+\label{ch:practica2}
+\input{sections/practica2/desarrollo}
+\input{sections/practica2/cuestionario}
+\input{sections/practica2/reto}
+
+\chapter{Práctica de laboratorio 3 --- RPC heterogéneo: Java, nginx y CGI/Shell}
+\label{ch:practica3}
+\input{sections/practica3/desarrollo}
+\input{sections/practica3/cuestionario}
+\input{sections/practica3/reto}
+
+\chapter{Conclusiones}
+\input{sections/conclusiones}
+
+% ---------------------------------------------------------------------
+% BIBLIOGRAFÍA
+% ---------------------------------------------------------------------
+\clearpage
+\printbibliography[heading=bibintoc,title={Referencias}]
+
+% ---------------------------------------------------------------------
+% APÉNDICES
+% ---------------------------------------------------------------------
+\appendix
+\chapter{Bitácora de sesión}
+\input{sections/bitacora}
+
+\end{document}

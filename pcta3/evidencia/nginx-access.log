@@ -1,0 +1,5 @@
+172.19.0.1 - - [20/Jul/2026:00:59:05 +0000] "GET /api/v1/saldo HTTP/1.1" 200 61 "-" "curl/8.21.0" "-"
+172.19.0.3 - - [20/Jul/2026:00:59:16 +0000] "GET /api/v1/cotizar?divisa=USD&monto=100.0 HTTP/1.1" 200 121 "-" "Java-http-client/17.0.7" "-"
+172.19.0.3 - - [20/Jul/2026:00:59:16 +0000] "GET /api/v1/cotizar?divisa=EUR&monto=250.0 HTTP/1.1" 200 121 "-" "Java-http-client/17.0.7" "-"
+172.19.0.3 - - [20/Jul/2026:00:59:16 +0000] "GET /api/v1/cotizar?divisa=MXN&monto=10.0 HTTP/1.1" 422 43 "-" "Java-http-client/17.0.7" "-"
+172.19.0.3 - - [20/Jul/2026:00:59:16 +0000] "GET /api/v1/saldo HTTP/1.1" 200 61 "-" "Java-http-client/17.0.7" "-"

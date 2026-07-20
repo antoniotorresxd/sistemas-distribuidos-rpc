@@ -1,0 +1,23 @@
+La Tabla~\ref{tab:bitacora} documenta, con las marcas de tiempo reales del sistema de archivos y de los registros de ejecución, la sesión de trabajo en la que se desarrollaron las tres prácticas, correspondiente al 19 de julio de 2026.
+
+\begin{table}[H]
+\centering
+\caption{Bitácora de la sesión de desarrollo (19 de julio de 2026, hora local CST).}
+\label{tab:bitacora}
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+\textbf{Hora} & \textbf{Actividad} & \textbf{Observaciones / incidentes} \\
+\midrule
+18:20 & Instalación de Docker (\texttt{pacman -S docker}) y creación del proyecto de la práctica 1. & El grupo \texttt{docker} no se activó en la sesión de shell hasta reiniciar sesión; se usó \texttt{sg docker} como mitigación temporal. \\
+18:21 -- 18:23 & Redacción de \texttt{saludo.cgi}, \texttt{calc.cgi} (reto) y la configuración de nginx para la práctica 1. & Sin incidentes. \\
+18:24 -- 18:27 & Construcción de la imagen \texttt{pcta1-rpc-cgi} (Fedora~36) y pruebas GET/POST/JSON con \texttt{curl}. & Ninguno; coincide con el instructivo. \\
+18:40 & Primera compilación exitosa del reporte técnico en LaTeX (práctica 1 únicamente). & Error inicial por el carácter de comillas rectas, activo bajo \texttt{babel/spanish}, dentro de una \texttt{caption}; corregido sustituyéndolas. \\
+18:48 -- 18:50 & Implementación de la práctica 2 (Java RMI): interfaz, \texttt{CalculadoraImpl}, \texttt{BitacoraRemota} y RMI sobre TLS con certificado autofirmado. & Error de compilación por codificación (\texttt{javac} asumía \texttt{US-ASCII}); corregido con \texttt{-encoding UTF-8}. \\
+19:00 -- 19:05 & Contenedores \texttt{rmi-servidor}/\texttt{rmi-cliente} en red dedicada; captura de tráfico con \texttt{tcpdump} distinguiendo JRMP en claro (puerto 1099) del \emph{handshake} TLS (puerto efímero). & Primer intento de \texttt{tcpdump} usó un filtro de puerto demasiado estrecho y no capturó el canal TLS; se repitió la captura sin filtro. \\
+21:24 -- 21:52 & Integración manual de las 16 capturas de pantalla (\texttt{src/ss/}) al reporte único y redacción del análisis de cada figura. & Ninguno. \\
+22:03 & Reporte unificado (3 prácticas, portada/índice/glosario únicos) compilado sin errores, 36 páginas. & — \\
+22:09 -- 23:05 & Reto de extensión de la práctica 3: \texttt{docker-compose.yml} con \texttt{nginx-exporter}, Prometheus y Grafana; generación del diagrama de despliegue. & \texttt{docker compose} no estaba instalado (se instaló \texttt{docker-compose} vía \texttt{pacman}); la captura de pantalla del \emph{dashboard} de Grafana no pudo automatizarse por un límite del navegador headless usado en la sesión y quedó pendiente de captura manual. \\
+23:10 & Medición de latencia comparada (RMI nativo vs.\ HTTP/JVM vs.\ HTTP/CGI) y actualización final del reporte. & Sin incidentes; resultados consistentes con la teoría del cuestionario de cierre. \\
+\bottomrule
+\end{tabularx}
+\end{table}

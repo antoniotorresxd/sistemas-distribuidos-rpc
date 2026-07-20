@@ -1,0 +1,24 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bbl-SAVE-ERROR
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+!*/evidencia/*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Compiled classes
+*.class
+out/
+
+# OS / editor
+.DS_Store
+*.swp
+.claude/

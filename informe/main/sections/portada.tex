@@ -1,0 +1,64 @@
+\begin{titlepage}
+    \begin{tikzpicture}[remember picture, overlay]
+
+        \coordinate (topleft) at ($(current page.north west) + (2.5cm, -2cm)$);
+        \coordinate (bottomleft) at ($(current page.south west) + (2.5cm, 2.5cm)$);
+
+        % 1. LOGO IPN (Arriba Izquierda)
+        \node[anchor=north, inner sep=0pt] at (topleft) {
+            \includegraphics[width=4cm]{../src/logos/ipn_logo.png}
+        };
+
+        % 2. LOGO ESIME (Abajo Izquierda)
+        \node[anchor=south, inner sep=0pt] at (bottomleft) {
+            \includegraphics[width=3cm]{../src/logos/esime_logo.jpg}
+        };
+
+        % 3. LÍNEAS VERTICALES LATERALES
+        \draw[esimegreen, line width=2pt]
+            ($(topleft) + (0, -3.2cm)$) -- ($(bottomleft) + (0, 3.8cm)$);
+        \draw[esimegreen, line width=1pt]
+            ($(topleft) + (0.15cm, -3.2cm)$) -- ($(bottomleft) + (0.15cm, 3.8cm)$);
+
+        % 4. ENCABEZADO SUPERIOR
+        \node[anchor=north] at ($(current page.north) + (1cm, -2.5cm)$) {
+            \begin{minipage}{14cm}
+                \centering
+                \large\textbf{INSTITUTO POLITÉCNICO NACIONAL}\\[0.4cm]
+
+                {\color{esimegreen}\hrule height 2pt}
+                \vspace{0.1cm}
+                {\color{esimegreen}\hrule height 1pt}
+                \vspace{0.4cm}
+
+                \large\textbf{ESCUELA SUPERIOR DE INGENIERÍA MECÁNICA Y ELÉCTRICA}\\
+                \textbf{UNIDAD CULHUACÁN}\\
+                \textbf{INGENIERÍA EN COMPUTACIÓN}
+            \end{minipage}
+        };
+    \end{tikzpicture}
+
+    % --- CONTENIDO DE TEXTO CENTRAL ---
+    \vspace*{5cm}
+    \centering
+
+    \large MATERIA:\\[0.2cm]
+    {\LARGE \textbf{SISTEMAS DISTRIBUIDOS}}\\[0.2cm]
+    \textit{Octavo semestre}\\[1cm]
+
+    {\Large \textbf{REPORTE TÉCNICO INTEGRADOR}}\\[0.6cm]
+
+    {\large \textit{Arquitectura de llamada a procedimientos remotos (RPC):\\
+    ejemplificación con Shell script sobre nginx (CGI), Java RMI\\
+    y un esquema heterogéneo Java--nginx--CGI}}\\[1cm]
+
+    \large Prácticas de laboratorio 1, 2 y 3\\[1.5cm]
+
+    \large ALUMNO:\\[0.3cm]
+    \textbf{ANTONIO DE JESUS TORRES MARTÍNEZ}\\[1.5cm]
+
+    \vfill
+
+    \normalsize Ciudad de México, \today
+
+\end{titlepage}
