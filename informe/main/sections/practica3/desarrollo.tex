@@ -209,7 +209,14 @@ $ for i in $(seq 1 30); do curl -s -o /dev/null -w "%{time_total}\n" \
     'http://localhost:8082/api/v1/cotizar?divisa=USD&monto=1'; done   # promedio: 18.060 ms
 \end{lstlisting}
 
-\evidencia{Terminal mostrando la ejecución de LatencyBench (RMI) y de los bucles de curl -w para ambas rutas de la práctica 3}{fig:p3-latencia}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{../src/ss/p3-latencia.png}
+\caption{Corrida confirmatoria: \texttt{LatencyBench} (RMI, $n=50$) y cinco muestras de \texttt{curl -w} para cada ruta de la práctica 3.}
+\label{fig:p3-latencia}
+\end{figure}
+
+La Figura~\ref{fig:p3-latencia} es una segunda corrida, independiente de la usada para construir la Tabla~\ref{tab:latencia}, ejecutada minutos después; sus cinco muestras de \texttt{/api/v1/saldo} (1.3--2.1~ms) y de \texttt{/api/v1/cotizar} (13.6--17.0~ms) caen dentro del mismo orden de magnitud que los promedios de 30 muestras reportados en la tabla, y RMI repite un promedio submilisegundo (1.029~ms). La variación de un run a otro (por ejemplo, 0.622~ms vs.\ 1.029~ms en RMI) es esperable en un entorno de laboratorio compartido —contención de CPU con el resto de los contenedores activos, \emph{jitter} del planificador del anfitrión— y no cambia la conclusión: la brecha de aproximadamente un orden de magnitud entre CGI y las otras dos rutas se mantiene consistente entre ambas corridas.
 
 Los resultados corroboran, con números reales, la respuesta teórica dada en el cuestionario de cierre de esta práctica sobre el costo de arranque de procesos: RMI —invocación directa sobre una conexión TCP persistente, sin intermediarios— resulta aproximadamente \textbf{3.7 veces más rápido} que atravesar nginx como \emph{proxy} hacia un servicio JVM igualmente persistente, y aproximadamente \textbf{29 veces más rápido} que invocar un script CGI que paga, en cada petición, el costo de que \texttt{fcgiwrap} haga \texttt{fork}/\texttt{exec} de un intérprete de bash nuevo. La diferencia entre las dos rutas de la práctica 3 (2.282~ms vs.\ 18.060~ms), a pesar de compartir el mismo \emph{gateway} nginx, aísla exactamente esa variable: el costo no está en el transporte HTTP ni en nginx, sino en el modelo de ejecución del backend. Esto confirma cuantitativamente por qué las arquitecturas de microservicios de alto volumen (Sección de casos de uso del marco teórico general) evitan CGI y prefieren procesos persistentes o RPC binario nativo como gRPC.
 

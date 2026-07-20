@@ -40,7 +40,14 @@ $ curl -s http://localhost:9091/api/v1/query?query=nginx_http_requests_total | j
 {"metric":{"__name__":"nginx_http_requests_total","job":"nginx"},"value":[..., "67"]}
 \end{lstlisting}
 
-\evidencia{Terminal mostrando docker compose up -d y las consultas anteriores a la API de Prometheus}{fig:p3-reto-prometheus}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../src/ss/p3-reto-prometheus.png}
+\caption{Verificación de Prometheus: el \emph{target} del exportador reporta salud \texttt{up} y la métrica \texttt{nginx\_http\_requests\_total} refleja 363 peticiones acumuladas.}
+\label{fig:p3-reto-prometheus}
+\end{figure}
+
+La Figura~\ref{fig:p3-reto-prometheus} confirma que el exportador y Prometheus están correctamente enlazados: el campo \texttt{health: up} indica que Prometheus logró conectarse al \emph{endpoint} \texttt{nginx-exporter:9113} en su último ciclo de raspado (cada 5 segundos, según \texttt{prometheus.yml}), y el contador \texttt{nginx\_http\_requests\_total} con valor \texttt{363} demuestra que la métrica no es un valor de ejemplo sino la cuenta real de peticiones que nginx ha servido desde que el contenedor arrancó —crece monótonamente con cada invocación de \texttt{cotizar.cgi} o \texttt{saldo}, sin que ninguno de los dos backends tenga que instrumentarse individualmente.
 
 \subsection*{Dashboard en Grafana}
 
@@ -54,7 +61,14 @@ $ curl -s http://localhost:3000/api/search
 [{"title":"RPC Gateway - nginx (Práctica 3)","url":"/d/.../rpc-gateway-nginx-practica-3"}]
 \end{lstlisting}
 
-\evidencia{Captura de pantalla del navegador en http://localhost:3000/d/.../rpc-gateway-nginx-practica-3 mostrando los cuatro paneles con datos}{fig:p3-reto-grafana}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../src/ss/p3-reto-grafana.png}
+\caption{Dashboard \emph{RPC Gateway - nginx (Práctica 3)} en Grafana, con los cuatro paneles mostrando la actividad real del gateway en las últimas 6 horas.}
+\label{fig:p3-reto-grafana}
+\end{figure}
+
+Los cuatro paneles de la Figura~\ref{fig:p3-reto-grafana} son consultas PromQL contra las mismas métricas verificadas en la Figura~\ref{fig:p3-reto-prometheus}, renderizadas como series de tiempo. El pico visible cerca de las 23:00 corresponde a las tandas de peticiones generadas durante las pruebas de esta sesión: se observa cómo \texttt{nginx\_connections\_accepted} salta de 0 a poco más de 200 en el momento en que se ejecutaron los bucles de \texttt{curl}, y cómo la tasa de peticiones (panel superior derecho) muestra el mismo pulso. Que el resto de la gráfica esté en cero es evidencia adicional, no un defecto: confirma que el contador no se incrementa por actividad espuria, solo por tráfico real dirigido al \emph{gateway}.
 
 Este mismo tablero es, en esencia, una automatización del análisis manual de la Figura~\ref{fig:p3-diagnostico}: en vez de leer el log de acceso línea por línea, Prometheus agrega la misma información (tasa de peticiones, conexiones) en series de tiempo consultables, y Grafana las visualiza. Es la respuesta operativa a la pregunta del cuestionario sobre dónde instrumentar observabilidad: en el \emph{gateway}, que por concentrar todo el tráfico es el único punto capaz de dar una vista unificada de los dos backends heterogéneos sin instrumentar cada uno por separado.
 
